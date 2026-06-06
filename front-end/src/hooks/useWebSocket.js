@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-const WS_URL = 'ws://localhost:8000/ws'
+const WS_URL = 'wss://securechat-backend-4ahi.onrender.com/ws'
 
 export function useWebSocket(username) {
   const ws = useRef(null)
