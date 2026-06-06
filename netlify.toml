@@ -1,4 +1,4 @@
 [build]
-  base = "frontend"
+  base = "front-end"
   command = "pnpm run build"
-  publish = "frontend/dist"
+  publish = "front-end/dist"
