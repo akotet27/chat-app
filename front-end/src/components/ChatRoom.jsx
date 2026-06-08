@@ -250,7 +250,7 @@ function ChatRoom({ username, onLeave }) {
             </button>
           </div>
           <p className="text-xs mt-2 text-center" style={{ color: '#3D2A12' }}>
-            ☕ WereWere · AES-128 encrypted · Press Enter to send
+            WereWere · AES-128 encrypted · Press Enter to send
           </p>
         </div>
 
