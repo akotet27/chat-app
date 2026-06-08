@@ -6,6 +6,16 @@ import json
 
 app = FastAPI()
 
+
+@app.get("/api/users")
+def get_users():
+    return {
+        "users": usernames,
+        "total": len(usernames),
+        "encrypted": list(users.values())
+    }
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,7 +37,8 @@ def decrypt(text: str) -> str:
 
 
 # ── STORAGE ─────────────────────────────────────────────
-users: Dict[str, str] = {}
+users: Dict[str, str] = {}        # { username: encrypted_username }
+usernames: List[str] = []          # plain array of usernames ← required
 group_messages: List[dict] = []
 private_messages: Dict[str, List[dict]] = {}
 msg_counter = 1
@@ -77,6 +88,9 @@ async def websocket_endpoint(ws: WebSocket, username: str):
 
     await manager.connect(username, ws)
     users[username] = encrypt(username)
+    # add to usernames array if not already there
+    if username not in usernames:
+        usernames.append(username)
 
     await manager.broadcast({
         "type": "user_joined",
@@ -234,6 +248,8 @@ async def websocket_endpoint(ws: WebSocket, username: str):
 
     except WebSocketDisconnect:
         manager.disconnect(username)
+        # keep username in array — they were here
+        # remove from online users only
         await manager.broadcast({
             "type": "user_left",
             "username": username,

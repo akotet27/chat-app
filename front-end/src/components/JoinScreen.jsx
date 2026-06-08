@@ -133,7 +133,7 @@ function JoinScreen({ onJoin }) {
         <div className="rounded-3xl p-7 border shadow-2xl"
           style={{ background: '#2D1F0E', borderColor: '#3D2A12' }}>
           <h2 className="font-bold text-xl mb-1" style={{ color: '#F5E6CC' }}>
-            Yene Konjo, join the buna! ☕
+            
           </h2>
           <p className="text-sm mb-6" style={{ color: '#8B6914' }}>
             Enter your name to start the gossip
@@ -157,7 +157,7 @@ function JoinScreen({ onJoin }) {
             className="w-full font-bold py-3 rounded-2xl text-sm transition-all hover:opacity-90 shadow-lg"
             style={{ background: 'linear-gradient(135deg, #C17817, #E8A838)', color: '#1A1208' }}
           >
-            ☕ Join WereWere
+            Join WereWere
           </button>
 
           <p className="text-center text-xs mt-4" style={{ color: '#5A3D10' }}>
