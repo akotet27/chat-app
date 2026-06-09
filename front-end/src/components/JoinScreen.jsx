@@ -1,77 +1,26 @@
-import { useState } from 'react'
-import { Shield, Zap, MessageCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Shield, Zap, MessageCircle, Coffee, Users, Lock } from 'lucide-react'
+import { useTheme } from '../hooks/useTheme'
 
-function SiniIcon({ size = 80 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 120 120">
-      {/* Gold circle bg */}
-      <circle cx="60" cy="60" r="58" fill="#C17817"/>
-
-      {/* Speech bubble large */}
-      <rect x="14" y="8" width="28" height="22" rx="6" fill="#1A1208"/>
-      <polygon points="20,30 15,40 28,30" fill="#1A1208"/>
-      <circle cx="21" cy="19" r="2" fill="#C17817"/>
-      <circle cx="28" cy="19" r="2" fill="#C17817"/>
-      <circle cx="35" cy="19" r="2" fill="#C17817"/>
-
-      {/* Speech bubble small */}
-      <rect x="68" y="4" width="22" height="18" rx="5" fill="#2D1F0E"/>
-      <polygon points="82,22 90,30 76,22" fill="#2D1F0E"/>
-      <circle cx="74" cy="13" r="1.8" fill="#C17817"/>
-      <circle cx="81" cy="13" r="1.8" fill="#C17817"/>
-      <circle cx="88" cy="13" r="1.8" fill="#C17817"/>
-
-      {/* Saucer */}
-      <ellipse cx="60" cy="98" rx="34" ry="5" fill="#8B5E10"/>
-      <ellipse cx="60" cy="97" rx="30" ry="4" fill="#F5F0E8"/>
-      <ellipse cx="60" cy="97" rx="30" ry="4" fill="none" stroke="#1A1208" stroke-width="1"/>
-      <rect x="42" y="94" width="5" height="5" fill="#1A1208" transform="rotate(45 44 96)"/>
-      <rect x="54" y="94" width="5" height="5" fill="#2D8C4E" transform="rotate(45 56 96)"/>
-      <rect x="66" y="94" width="5" height="5" fill="#1A1208" transform="rotate(45 68 96)"/>
-      <rect x="78" y="94" width="5" height="5" fill="#2D8C4E" transform="rotate(45 80 96)"/>
-
-      {/* Round circular base */}
-      <ellipse cx="60" cy="92" rx="10" ry="4" fill="#2D1F0E"/>
-      <rect x="50" y="88" width="20" height="6" rx="3" fill="#1A1208"/>
-
-      {/* Cup body */}
-      <path d="M28 56 Q26 48 60 45 Q94 48 92 56 Q96 66 92 76 Q87 87 76 91 Q70 93 60 93 Q50 93 44 91 Q33 87 28 76 Q24 66 28 56 Z" fill="#1A1208"/>
-
-      {/* Handle */}
-      <path d="M92 60 Q104 60 104 68 Q104 76 92 78" fill="none" stroke="#1A1208" stroke-width="4" stroke-linecap="round"/>
-
-      {/* Pattern band */}
-      <clipPath id="sini-clip">
-        <path d="M28 56 Q26 48 60 45 Q94 48 92 56 Q96 66 92 76 Q87 87 76 91 Q70 93 60 93 Q50 93 44 91 Q33 87 28 76 Q24 66 28 56 Z"/>
-      </clipPath>
-      <g clipPath="url(#sini-clip)">
-        <rect x="22" y="58" width="76" height="24" fill="#E8A838"/>
-        <rect x="26" y="62" width="7" height="7" fill="#1A1208" transform="rotate(45 29 65)"/>
-        <rect x="36" y="62" width="7" height="7" fill="#2D8C4E" transform="rotate(45 39 65)"/>
-        <rect x="46" y="62" width="7" height="7" fill="#1A1208" transform="rotate(45 49 65)"/>
-        <rect x="56" y="62" width="7" height="7" fill="#2D8C4E" transform="rotate(45 59 65)"/>
-        <rect x="66" y="62" width="7" height="7" fill="#1A1208" transform="rotate(45 69 65)"/>
-        <rect x="76" y="62" width="7" height="7" fill="#2D8C4E" transform="rotate(45 79 65)"/>
-        <rect x="31" y="70" width="7" height="7" fill="#2D8C4E" transform="rotate(45 34 73)"/>
-        <rect x="41" y="70" width="7" height="7" fill="#F5F0E8" transform="rotate(45 44 73)"/>
-        <rect x="51" y="70" width="7" height="7" fill="#1A1208" transform="rotate(45 54 73)"/>
-        <rect x="61" y="70" width="7" height="7" fill="#F5F0E8" transform="rotate(45 64 73)"/>
-        <rect x="71" y="70" width="7" height="7" fill="#2D8C4E" transform="rotate(45 74 73)"/>
-        <rect x="22" y="58" width="76" height="2" fill="#0D0804"/>
-        <rect x="22" y="80" width="76" height="2" fill="#0D0804"/>
-      </g>
-
-      {/* Rim */}
-      <ellipse cx="60" cy="53" rx="24" ry="7" fill="#1A1208"/>
-      <ellipse cx="60" cy="53" rx="24" ry="7" fill="none" stroke="#E8A838" stroke-width="1"/>
-      <ellipse cx="60" cy="51" rx="20" ry="5" fill="#080604"/>
-    </svg>
-  )
-}
-
-function JoinScreen({ onJoin }) {
-  const [name, setName] = useState('')
+function JoinScreen({ onJoin, savedName }) {
+  const [name, setName] = useState(savedName || '')
   const [error, setError] = useState('')
+  const [showForm, setShowForm] = useState(false)
+  const [logoClicks, setLogoClicks] = useState(0)
+  const { theme } = useTheme()
+  const c = theme.colors
+
+  // clicking logo toggles the form
+  const handleLogoClick = () => {
+    setLogoClicks(prev => prev + 1)
+    setShowForm(prev => !prev)
+  }
+
+  // clicking anywhere else on the page shows the form
+  const handlePageClick = (e) => {
+    if (e.target.closest('.logo-area')) return
+    if (!showForm) setShowForm(true)
+  }
 
   const handleJoin = () => {
     if (!name.trim()) { setError('Please enter your name'); return }
@@ -84,85 +33,232 @@ function JoinScreen({ onJoin }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg, #1A1208 0%, #2D1F0E 50%, #1A1208 100%)' }}>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden cursor-pointer"
+      style={{ background: `linear-gradient(135deg, ${c.bg} 0%, ${c.bgSecondary} 50%, ${c.bg} 100%)` }}
+      onClick={handlePageClick}
+    >
 
-      {/* Background coffee pattern */}
+      {/* Animated background circles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <div key={i} className="absolute opacity-5 text-5xl"
-            style={{ left: `${(i * 41) % 95}%`, top: `${(i * 67) % 90}%` }}>
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full opacity-5"
+            style={{
+              width: `${120 + i * 40}px`,
+              height: `${120 + i * 40}px`,
+              background: c.primary,
+              left: `${(i * 37) % 90}%`,
+              top: `${(i * 53) % 85}%`,
+              animation: `float ${4 + i}s ease-in-out infinite alternate`,
+              animationDelay: `${i * 0.5}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Coffee pattern background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(10)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-4xl opacity-3"
+            style={{
+              left: `${(i * 41) % 95}%`,
+              top: `${(i * 67) % 90}%`,
+              transform: 'rotate(-15deg)',
+              opacity: 0.03,
+            }}
+          >
             ☕
           </div>
         ))}
       </div>
 
-      <div className="w-full max-w-md relative z-10">
+      <style>{`
+        @keyframes float {
+          from { transform: translateY(0px) scale(1); }
+          to { transform: translateY(-20px) scale(1.05); }
+        }
+        @keyframes pulse-ring {
+          0% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.08); opacity: 0.6; }
+          100% { transform: scale(1); opacity: 0.8; }
+        }
+        @keyframes slide-up {
+          from { transform: translateY(30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
 
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-5">
-            <SiniIcon size={100} />
+      <div className="w-full max-w-sm relative z-10">
+
+        {/* Logo area — click to toggle form */}
+        <div
+          className="logo-area text-center mb-8 cursor-pointer select-none"
+          onClick={handleLogoClick}
+        >
+          {/* Animated logo ring */}
+          <div className="relative inline-flex items-center justify-center mb-5">
+            {/* Outer pulse ring */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: '110px',
+                height: '110px',
+                border: `2px solid ${c.primary}`,
+                opacity: 0.3,
+                animation: 'pulse-ring 2s ease-in-out infinite',
+              }}
+            />
+            {/* Inner ring */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: '95px',
+                height: '95px',
+                border: `1px solid ${c.primaryLight}`,
+                opacity: 0.2,
+              }}
+            />
+            {/* Icon circle */}
+            <div
+              className="relative w-20 h-20 rounded-2xl flex items-center justify-center shadow-2xl"
+              style={{
+                background: `linear-gradient(135deg, ${c.primary}, ${c.primaryLight})`,
+                transform: showForm ? 'rotate(0deg)' : 'rotate(-5deg)',
+                transition: 'transform 0.3s ease',
+              }}
+            >
+              <div className="relative">
+                <Coffee className="w-8 h-8" style={{ color: c.bg }} strokeWidth={2}/>
+                <div
+                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                  style={{ background: c.bg }}
+                >
+                  <MessageCircle className="w-3 h-3" style={{ color: c.primary }} strokeWidth={2.5}/>
+                </div>
+              </div>
+            </div>
           </div>
-          <h1 className="text-5xl font-black mb-2"
-            style={{ color: '#F5E6CC', letterSpacing: '-2px' }}>
+
+          {/* App name */}
+          <h1
+            className="text-5xl font-black mb-1 tracking-tight"
+            style={{ color: c.text }}
+          >
             WereWere
           </h1>
-          <p className="text-sm font-medium tracking-widest uppercase"
-            style={{ color: '#C17817' }}>
+          <p
+            className="text-xs font-medium tracking-widest uppercase"
+            style={{ color: c.primary }}
+          >
             Where the gossip lives
           </p>
+
+          {/* Hint text */}
+          {!showForm && (
+            <p
+              className="text-xs mt-3 animate-pulse"
+              style={{ color: c.textFaint }}
+            >
+              tap anywhere to join
+            </p>
+          )}
         </div>
 
-        {/* Feature pills */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
+        {/* Stats row */}
+        <div
+          className="grid grid-cols-3 gap-2 mb-6"
+          style={{
+            opacity: showForm ? 1 : 0.6,
+            transition: 'opacity 0.3s',
+          }}
+        >
           {[
-            { icon: <Shield className="w-5 h-5" />, label: 'Encrypted', color: '#E8A838' },
-            { icon: <Zap className="w-5 h-5" />, label: 'Real-time', color: '#E8A838' },
-            { icon: <MessageCircle className="w-5 h-5" />, label: 'Private DMs', color: '#E8A838' },
+            { icon: <Lock className="w-4 h-4"/>, label: 'Encrypted' },
+            { icon: <Zap className="w-4 h-4"/>, label: 'Real-time' },
+            { icon: <Users className="w-4 h-4"/>, label: 'Groups & DMs' },
           ].map((f, i) => (
-            <div key={i} className="rounded-2xl p-3 text-center border"
-              style={{ background: '#2D1F0E', borderColor: '#3D2A12' }}>
-              <div style={{ color: f.color }} className="flex justify-center mb-1">{f.icon}</div>
-              <p className="text-xs" style={{ color: '#C17817' }}>{f.label}</p>
+            <div
+              key={i}
+              className="rounded-2xl p-3 text-center border"
+              style={{ background: c.bgTertiary, borderColor: c.border }}
+            >
+              <div className="flex justify-center mb-1" style={{ color: c.primaryLight }}>
+                {f.icon}
+              </div>
+              <p className="text-xs font-medium" style={{ color: c.textMuted }}>
+                {f.label}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Join card */}
-        <div className="rounded-3xl p-7 border shadow-2xl"
-          style={{ background: '#2D1F0E', borderColor: '#3D2A12' }}>
-          <h2 className="font-bold text-xl mb-1" style={{ color: '#F5E6CC' }}>
-            
-          </h2>
-          <p className="text-sm mb-6" style={{ color: '#8B6914' }}>
-            Enter your name to start the gossip
-          </p>
-
-          <input
-            type="text"
-            value={name}
-            onChange={e => { setName(e.target.value); setError('') }}
-            onKeyDown={handleKey}
-            placeholder="Your name..."
-            maxLength={20}
-            className="w-full rounded-2xl px-4 py-3 text-sm focus:outline-none mb-3 transition-all"
-            style={{ background: '#1A1208', color: '#F5E6CC', border: '1px solid #3D2A12' }}
-          />
-
-          {error && <p className="text-red-400 text-xs mb-3">{error}</p>}
-
-          <button
-            onClick={handleJoin}
-            className="w-full font-bold py-3 rounded-2xl text-sm transition-all hover:opacity-90 shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #C17817, #E8A838)', color: '#1A1208' }}
+        {/* Join form — slides up when shown */}
+        <div
+          style={{
+            animation: showForm ? 'slide-up 0.3s ease forwards' : 'none',
+            opacity: showForm ? 1 : 0,
+            pointerEvents: showForm ? 'auto' : 'none',
+            transition: 'opacity 0.3s ease',
+          }}
+        >
+          <div
+            className="rounded-3xl p-6 border shadow-2xl"
+            style={{ background: c.bgSecondary, borderColor: c.border }}
+            onClick={e => e.stopPropagation()}
           >
-            Join WereWere
-          </button>
+            <h2 className="font-bold text-lg mb-1" style={{ color: c.text }}>
+              Yene Konjo, join the buna! ☕
+            </h2>
+            <p className="text-sm mb-5" style={{ color: c.textMuted }}>
+              Enter your name to start chatting
+            </p>
 
-          <p className="text-center text-xs mt-4" style={{ color: '#5A3D10' }}>
-            🔒 All messages encrypted with AES-128
-          </p>
+            <input
+              type="text"
+              value={name}
+              onChange={e => { setName(e.target.value); setError('') }}
+              onKeyDown={handleKey}
+              placeholder="Your name..."
+              maxLength={20}
+              autoFocus={showForm}
+              className="w-full rounded-2xl px-4 py-3 text-sm focus:outline-none mb-3 transition-all"
+              style={{
+                background: c.bg,
+                color: c.text,
+                border: `1px solid ${c.border}`,
+              }}
+            />
+
+            {error && (
+              <p className="text-red-400 text-xs mb-3">{error}</p>
+            )}
+
+            <button
+              onClick={handleJoin}
+              className="w-full font-bold py-3 rounded-2xl text-sm transition-all hover:opacity-90 shadow-lg"
+              style={{
+                background: `linear-gradient(135deg, ${c.primary}, ${c.primaryLight})`,
+                color: c.bg,
+              }}
+            >
+              ☕ Join WereWere
+            </button>
+
+            <p
+              className="text-center text-xs mt-4"
+              style={{ color: c.textFaint }}
+            >
+              🔒 AES-128 encrypted · {logoClicks > 3 ? '☕'.repeat(Math.min(logoClicks - 3, 5)) : 'All messages protected'}
+            </p>
+          </div>
         </div>
 
       </div>

@@ -1,66 +1,33 @@
-import { MessageCircle, Eye, EyeOff, Users, Plus, X } from 'lucide-react'
 import { useState } from 'react'
-
-function SiniIconSmall() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 120 120">
-      <circle cx="60" cy="60" r="58" fill="#C17817"/>
-      <rect x="14" y="8" width="28" height="22" rx="6" fill="#1A1208"/>
-      <polygon points="20,30 15,40 28,30" fill="#1A1208"/>
-      <circle cx="21" cy="19" r="2" fill="#C17817"/>
-      <circle cx="28" cy="19" r="2" fill="#C17817"/>
-      <circle cx="35" cy="19" r="2" fill="#C17817"/>
-      <rect x="68" y="4" width="22" height="18" rx="5" fill="#2D1F0E"/>
-      <polygon points="82,22 90,30 76,22" fill="#2D1F0E"/>
-      <circle cx="74" cy="13" r="1.8" fill="#C17817"/>
-      <circle cx="81" cy="13" r="1.8" fill="#C17817"/>
-      <circle cx="88" cy="13" r="1.8" fill="#C17817"/>
-      <ellipse cx="60" cy="98" rx="34" ry="5" fill="#8B5E10"/>
-      <ellipse cx="60" cy="97" rx="30" ry="4" fill="#F5F0E8"/>
-      <ellipse cx="60" cy="97" rx="30" ry="4" fill="none" stroke="#1A1208" stroke-width="1"/>
-      <ellipse cx="60" cy="92" rx="10" ry="4" fill="#2D1F0E"/>
-      <rect x="50" y="88" width="20" height="6" rx="3" fill="#1A1208"/>
-      <path d="M28 56 Q26 48 60 45 Q94 48 92 56 Q96 66 92 76 Q87 87 76 91 Q70 93 60 93 Q50 93 44 91 Q33 87 28 76 Q24 66 28 56 Z" fill="#1A1208"/>
-      <path d="M92 60 Q104 60 104 68 Q104 76 92 78" fill="none" stroke="#1A1208" stroke-width="4" stroke-linecap="round"/>
-      <clipPath id="sc">
-        <path d="M28 56 Q26 48 60 45 Q94 48 92 56 Q96 66 92 76 Q87 87 76 91 Q70 93 60 93 Q50 93 44 91 Q33 87 28 76 Q24 66 28 56 Z"/>
-      </clipPath>
-      <g clipPath="url(#sc)">
-        <rect x="22" y="58" width="76" height="24" fill="#E8A838"/>
-        <rect x="26" y="62" width="7" height="7" fill="#1A1208" transform="rotate(45 29 65)"/>
-        <rect x="36" y="62" width="7" height="7" fill="#2D8C4E" transform="rotate(45 39 65)"/>
-        <rect x="46" y="62" width="7" height="7" fill="#1A1208" transform="rotate(45 49 65)"/>
-        <rect x="56" y="62" width="7" height="7" fill="#2D8C4E" transform="rotate(45 59 65)"/>
-        <rect x="66" y="62" width="7" height="7" fill="#1A1208" transform="rotate(45 69 65)"/>
-        <rect x="31" y="70" width="7" height="7" fill="#2D8C4E" transform="rotate(45 34 73)"/>
-        <rect x="41" y="70" width="7" height="7" fill="#F5F0E8" transform="rotate(45 44 73)"/>
-        <rect x="51" y="70" width="7" height="7" fill="#1A1208" transform="rotate(45 54 73)"/>
-        <rect x="61" y="70" width="7" height="7" fill="#F5F0E8" transform="rotate(45 64 73)"/>
-        <rect x="22" y="58" width="76" height="2" fill="#0D0804"/>
-        <rect x="22" y="80" width="76" height="2" fill="#0D0804"/>
-      </g>
-      <ellipse cx="60" cy="53" rx="24" ry="7" fill="#1A1208"/>
-      <ellipse cx="60" cy="51" rx="20" ry="5" fill="#080604"/>
-    </svg>
-  )
-}
+import { 
+  MessageCircle, Users, Lock, Plus, X, 
+  Search, Settings, Coffee, Hash,
+  Eye, EyeOff, LogOut, ChevronDown,
+  ChevronRight, Shield
+} from 'lucide-react'
+import { Avatar } from './ProfileCard'
 
 function Sidebar({
-  username,
-  onlineUsers,
-  unreadCounts,
-  activeRoom,
-  onSelectRoom,
-  showEncryption,
-  onToggleEncryption,
-  darkMode,
-  onToggleDark,
-  channels,
-  onCreateChannel,
-  onLeave,
+  username, status, onlineUsers, unreadCounts,
+  activeRoom, onSelectRoom, showEncryption,
+  onToggleEncryption, channels, onCreateChannel,
+  onLeave, onGoHome, onOpenSearch, onOpenAppearance,
+  onOpenProfile, theme, groups, onCreateGroup,
 }) {
+  const c = theme.colors
   const [showNewChannel, setShowNewChannel] = useState(false)
+  const [showNewGroup, setShowNewGroup] = useState(false)
   const [newChannelName, setNewChannelName] = useState('')
+  const [newGroupName, setNewGroupName] = useState('')
+  const [newGroupMembers, setNewGroupMembers] = useState([])
+  const [channelsOpen, setChannelsOpen] = useState(true)
+  const [groupsOpen, setGroupsOpen] = useState(true)
+  const [dmsOpen, setDmsOpen] = useState(true)
+
+  const statusColors = {
+    online: '#4CAF50', busy: '#FF5722',
+    away: '#FFC107', buna: '#C17817'
+  }
 
   const handleCreateChannel = () => {
     if (!newChannelName.trim()) return
@@ -69,188 +36,422 @@ function Sidebar({
     setShowNewChannel(false)
   }
 
-  return (
-    <div className="w-64 flex flex-col h-full"
-      style={{ background: '#1A1208', borderRight: '1px solid #3D2A12' }}>
+  const handleCreateGroup = () => {
+    if (!newGroupName.trim() || newGroupMembers.length === 0) return
+    onCreateGroup(newGroupName.trim(), newGroupMembers)
+    setNewGroupName('')
+    setNewGroupMembers([])
+    setShowNewGroup(false)
+  }
 
-      {/* Header */}
-      <div className="p-4" style={{ borderBottom: '1px solid #3D2A12' }}>
-        <div className="flex items-center gap-2 mb-3">
-          <SiniIconSmall />
-          <span className="font-black text-lg" style={{ color: '#F5E6CC', letterSpacing: '-0.5px' }}>
+  const toggleGroupMember = (user) => {
+    setNewGroupMembers(prev =>
+      prev.includes(user) ? prev.filter(u => u !== user) : [...prev, user]
+    )
+  }
+
+  const otherUsers = onlineUsers.filter(u => u !== username)
+
+  return (
+    <div
+      className="flex flex-col h-full"
+      style={{
+        width: '260px',
+        minWidth: '260px',
+        background: c.bgSecondary,
+        borderRight: `1px solid ${c.border}`,
+      }}
+    >
+      {/* ── Header ── */}
+      <div className="p-4" style={{ borderBottom: `1px solid ${c.border}` }}>
+
+        {/* Logo — click to go home */}
+        <button
+          onClick={onGoHome}
+          className="flex items-center gap-2 mb-4 w-full hover:opacity-80 transition-opacity"
+        >
+          <div
+            className="w-8 h-8 rounded-xl flex items-center justify-center relative"
+            style={{ background: `linear-gradient(135deg, ${c.primary}, ${c.primaryLight})` }}
+          >
+            <Coffee className="w-4 h-4" style={{ color: c.bg }} strokeWidth={2}/>
+            <div
+              className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full flex items-center justify-center"
+              style={{ background: c.bg }}
+            >
+              <MessageCircle className="w-2 h-2" style={{ color: c.primary }} strokeWidth={2.5}/>
+            </div>
+          </div>
+          <span className="font-black text-base" style={{ color: c.text, letterSpacing: '-0.5px' }}>
             WereWere
           </span>
-        </div>
+        </button>
 
-        {/* Current user */}
-        <div className="flex items-center gap-2 rounded-xl px-3 py-2"
-          style={{ background: '#2D1F0E' }}>
-          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-            style={{ background: '#C17817', color: '#1A1208' }}>
-            {username[0].toUpperCase()}
-          </div>
-          <span className="text-sm font-medium truncate flex-1" style={{ color: '#F5E6CC' }}>
-            {username}
-          </span>
-          <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0"/>
-        </div>
-      </div>
-
-      {/* Channels */}
-      <div className="p-3" style={{ borderBottom: '1px solid #3D2A12' }}>
-        <div className="flex items-center justify-between mb-2 px-1">
-          <p className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: '#5A3D10' }}>
-            Channels
-          </p>
-          <button
-            onClick={() => setShowNewChannel(!showNewChannel)}
-            className="rounded-lg p-1 transition-colors hover:opacity-80"
-            style={{ color: '#C17817' }}
-            title="Create channel"
-          >
-            <Plus className="w-3.5 h-3.5"/>
-          </button>
-        </div>
-
-        {/* New channel input */}
-        {showNewChannel && (
-          <div className="mb-2 flex gap-1">
-            <input
-              autoFocus
-              value={newChannelName}
-              onChange={e => setNewChannelName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleCreateChannel()}
-              placeholder="channel-name"
-              className="flex-1 text-xs rounded-lg px-2 py-1.5 focus:outline-none"
+        {/* Current user profile button */}
+        <button
+          onClick={onOpenProfile}
+          className="flex items-center gap-2 rounded-xl px-3 py-2 w-full transition-colors"
+          style={{ background: c.bgTertiary }}
+          onMouseEnter={e => e.currentTarget.style.background = c.border}
+          onMouseLeave={e => e.currentTarget.style.background = c.bgTertiary}
+        >
+          <div className="relative flex-shrink-0">
+            <Avatar username={username} size={30}/>
+            <div
+              className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2"
               style={{
-                background: '#2D1F0E',
-                color: '#F5E6CC',
-                border: '1px solid #C17817'
+                background: statusColors[status] || '#4CAF50',
+                borderColor: c.bgSecondary,
               }}
             />
-            <button
-              onClick={handleCreateChannel}
-              className="rounded-lg px-2 text-xs font-bold"
-              style={{ background: '#C17817', color: '#1A1208' }}
-            >
-              +
-            </button>
-            <button
-              onClick={() => setShowNewChannel(false)}
-              className="rounded-lg px-1"
-              style={{ color: '#5A3D10' }}
-            >
-              <X className="w-3 h-3"/>
-            </button>
           </div>
-        )}
-
-        {/* Channel list */}
-        {channels.map(channel => (
-          <button
-            key={channel}
-            onClick={() => onSelectRoom(channel)}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-colors mb-1 text-sm font-medium"
-            style={{
-              background: activeRoom === channel ? '#C17817' : 'transparent',
-              color: activeRoom === channel ? '#1A1208' : '#8B6914',
-            }}
-          >
-            <MessageCircle className="w-4 h-4 flex-shrink-0"/>
-            <span># {channel}</span>
-          </button>
-        ))}
+          <span className="text-sm font-semibold truncate flex-1 text-left"
+            style={{ color: c.text }}>
+            {username}
+          </span>
+          <Settings className="w-3.5 h-3.5 flex-shrink-0" style={{ color: c.textFaint }}/>
+        </button>
       </div>
 
-      {/* DMs */}
-      <div className="flex-1 overflow-y-auto p-3">
-        <div className="flex items-center gap-2 mb-2 px-1">
-          <Users className="w-3.5 h-3.5" style={{ color: '#5A3D10' }}/>
-          <p className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: '#5A3D10' }}>
-            Direct Messages
-          </p>
-          <span className="ml-auto text-xs" style={{ color: '#5A3D10' }}>
-            {onlineUsers.filter(u => u !== username).length}
+      {/* ── Search button ── */}
+      <div className="px-3 pt-3">
+        <button
+          onClick={onOpenSearch}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-colors"
+          style={{ background: c.bgTertiary, color: c.textMuted }}
+          onMouseEnter={e => e.currentTarget.style.background = c.border}
+          onMouseLeave={e => e.currentTarget.style.background = c.bgTertiary}
+        >
+          <Search className="w-4 h-4"/>
+          <span>Search...</span>
+          <span
+            className="ml-auto text-xs px-1.5 py-0.5 rounded"
+            style={{ background: c.border, color: c.textFaint }}
+          >
+            ⌘K
           </span>
+        </button>
+      </div>
+
+      {/* ── Scrollable content ── */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+
+        {/* ── CHANNELS section ── */}
+        <div>
+          <button
+            onClick={() => setChannelsOpen(!channelsOpen)}
+            className="flex items-center gap-1 w-full px-2 py-1.5 rounded-lg transition-colors"
+            style={{ color: c.textFaint }}
+            onMouseEnter={e => e.currentTarget.style.color = c.textMuted}
+            onMouseLeave={e => e.currentTarget.style.color = c.textFaint}
+          >
+            {channelsOpen
+              ? <ChevronDown className="w-3.5 h-3.5"/>
+              : <ChevronRight className="w-3.5 h-3.5"/>
+            }
+            <span className="text-xs font-bold uppercase tracking-wider flex-1 text-left">
+              Channels
+            </span>
+            <button
+              onClick={e => { e.stopPropagation(); setShowNewChannel(!showNewChannel) }}
+              className="w-5 h-5 rounded flex items-center justify-center hover:opacity-80"
+              style={{ color: c.textFaint }}
+            >
+              <Plus className="w-3.5 h-3.5"/>
+            </button>
+          </button>
+
+          {/* New channel input */}
+          {showNewChannel && (
+            <div className="flex gap-1 px-2 py-1">
+              <input
+                autoFocus
+                value={newChannelName}
+                onChange={e => setNewChannelName(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleCreateChannel()
+                  if (e.key === 'Escape') setShowNewChannel(false)
+                }}
+                placeholder="channel-name"
+                className="flex-1 text-xs rounded-lg px-2 py-1.5 focus:outline-none"
+                style={{
+                  background: c.bgTertiary,
+                  color: c.text,
+                  border: `1px solid ${c.primary}`,
+                }}
+              />
+              <button
+                onClick={handleCreateChannel}
+                className="w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{ background: c.primary, color: c.bg }}
+              >
+                <Plus className="w-3.5 h-3.5"/>
+              </button>
+              <button
+                onClick={() => setShowNewChannel(false)}
+                className="w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{ color: c.textFaint }}
+              >
+                <X className="w-3.5 h-3.5"/>
+              </button>
+            </div>
+          )}
+
+          {channelsOpen && channels.map(channel => (
+            <button
+              key={channel}
+              onClick={() => onSelectRoom(channel)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all text-sm font-medium mb-0.5"
+              style={{
+                background: activeRoom === channel ? c.primary + '22' : 'transparent',
+                color: activeRoom === channel ? c.primary : c.textMuted,
+                borderLeft: activeRoom === channel ? `3px solid ${c.primary}` : '3px solid transparent',
+              }}
+              onMouseEnter={e => {
+                if (activeRoom !== channel) e.currentTarget.style.background = c.bgTertiary
+              }}
+              onMouseLeave={e => {
+                if (activeRoom !== channel) e.currentTarget.style.background = 'transparent'
+              }}
+            >
+              <Hash className="w-4 h-4 flex-shrink-0"/>
+              <span className="truncate">{channel}</span>
+            </button>
+          ))}
         </div>
 
-        {onlineUsers.filter(u => u !== username).length === 0 ? (
-          <p className="text-xs text-center py-4" style={{ color: '#3D2A12' }}>
-            No other users online
-          </p>
-        ) : (
-          onlineUsers.filter(u => u !== username).map(user => (
+        {/* ── GROUPS section ── */}
+        <div>
+          <button
+            onClick={() => setGroupsOpen(!groupsOpen)}
+            className="flex items-center gap-1 w-full px-2 py-1.5 rounded-lg transition-colors mt-2"
+            style={{ color: c.textFaint }}
+            onMouseEnter={e => e.currentTarget.style.color = c.textMuted}
+            onMouseLeave={e => e.currentTarget.style.color = c.textFaint}
+          >
+            {groupsOpen
+              ? <ChevronDown className="w-3.5 h-3.5"/>
+              : <ChevronRight className="w-3.5 h-3.5"/>
+            }
+            <span className="text-xs font-bold uppercase tracking-wider flex-1 text-left">
+              Groups
+            </span>
+            <button
+              onClick={e => { e.stopPropagation(); setShowNewGroup(!showNewGroup) }}
+              className="w-5 h-5 rounded flex items-center justify-center hover:opacity-80"
+              style={{ color: c.textFaint }}
+            >
+              <Plus className="w-3.5 h-3.5"/>
+            </button>
+          </button>
+
+          {/* New group form */}
+          {showNewGroup && (
+            <div
+              className="mx-2 mb-2 p-3 rounded-xl border"
+              style={{ background: c.bgTertiary, borderColor: c.border }}
+            >
+              <input
+                autoFocus
+                value={newGroupName}
+                onChange={e => setNewGroupName(e.target.value)}
+                placeholder="Group name..."
+                className="w-full text-xs rounded-lg px-2 py-1.5 focus:outline-none mb-2"
+                style={{
+                  background: c.bg,
+                  color: c.text,
+                  border: `1px solid ${c.border}`,
+                }}
+              />
+              <p className="text-xs mb-2" style={{ color: c.textFaint }}>
+                Add members:
+              </p>
+              <div className="flex flex-wrap gap-1 mb-2">
+                {otherUsers.map(user => (
+                  <button
+                    key={user}
+                    onClick={() => toggleGroupMember(user)}
+                    className="text-xs px-2 py-1 rounded-full border transition-colors"
+                    style={{
+                      background: newGroupMembers.includes(user) ? c.primary : 'transparent',
+                      color: newGroupMembers.includes(user) ? c.bg : c.textMuted,
+                      borderColor: newGroupMembers.includes(user) ? c.primary : c.border,
+                    }}
+                  >
+                    {user}
+                  </button>
+                ))}
+                {otherUsers.length === 0 && (
+                  <p className="text-xs" style={{ color: c.textFaint }}>
+                    No other users online
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-1">
+                <button
+                  onClick={handleCreateGroup}
+                  disabled={!newGroupName.trim() || newGroupMembers.length === 0}
+                  className="flex-1 text-xs py-1.5 rounded-lg font-medium disabled:opacity-40"
+                  style={{ background: c.primary, color: c.bg }}
+                >
+                  Create
+                </button>
+                <button
+                  onClick={() => { setShowNewGroup(false); setNewGroupMembers([]) }}
+                  className="text-xs px-3 py-1.5 rounded-lg"
+                  style={{ color: c.textFaint }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {groupsOpen && groups && groups.map(group => (
+            <button
+              key={group.id}
+              onClick={() => onSelectRoom(`group:${group.id}`)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all text-sm font-medium mb-0.5"
+              style={{
+                background: activeRoom === `group:${group.id}` ? c.primary + '22' : 'transparent',
+                color: activeRoom === `group:${group.id}` ? c.primary : c.textMuted,
+                borderLeft: activeRoom === `group:${group.id}` ? `3px solid ${c.primary}` : '3px solid transparent',
+              }}
+              onMouseEnter={e => {
+                if (activeRoom !== `group:${group.id}`) e.currentTarget.style.background = c.bgTertiary
+              }}
+              onMouseLeave={e => {
+                if (activeRoom !== `group:${group.id}`) e.currentTarget.style.background = 'transparent'
+              }}
+            >
+              <div
+                className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold"
+                style={{ background: c.primary + '33', color: c.primary }}
+              >
+                {group.name[0].toUpperCase()}
+              </div>
+              <span className="truncate flex-1 text-left">{group.name}</span>
+              <span
+                className="text-xs flex-shrink-0"
+                style={{ color: c.textFaint }}
+              >
+                {group.members.length}
+              </span>
+            </button>
+          ))}
+
+          {groupsOpen && (!groups || groups.length === 0) && (
+            <p className="text-xs px-4 py-2" style={{ color: c.textFaint }}>
+              No groups yet
+            </p>
+          )}
+        </div>
+
+        {/* ── DIRECT MESSAGES section ── */}
+        <div>
+          <button
+            onClick={() => setDmsOpen(!dmsOpen)}
+            className="flex items-center gap-1 w-full px-2 py-1.5 rounded-lg transition-colors mt-2"
+            style={{ color: c.textFaint }}
+          >
+            {dmsOpen
+              ? <ChevronDown className="w-3.5 h-3.5"/>
+              : <ChevronRight className="w-3.5 h-3.5"/>
+            }
+            <span className="text-xs font-bold uppercase tracking-wider flex-1 text-left">
+              Direct Messages
+            </span>
+            <span className="text-xs" style={{ color: c.textFaint }}>
+              {otherUsers.length}
+            </span>
+          </button>
+
+          {dmsOpen && otherUsers.length === 0 && (
+            <p className="text-xs px-4 py-2" style={{ color: c.textFaint }}>
+              No other users online
+            </p>
+          )}
+
+          {dmsOpen && otherUsers.map(user => (
             <button
               key={user}
               onClick={() => onSelectRoom(user)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors mb-1"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all mb-0.5"
               style={{
-                background: activeRoom === user ? '#C17817' : 'transparent',
-                color: activeRoom === user ? '#1A1208' : '#8B6914',
+                background: activeRoom === user ? c.primary + '22' : 'transparent',
+                borderLeft: activeRoom === user ? `3px solid ${c.primary}` : '3px solid transparent',
+              }}
+              onMouseEnter={e => {
+                if (activeRoom !== user) e.currentTarget.style.background = c.bgTertiary
+              }}
+              onMouseLeave={e => {
+                if (activeRoom !== user) e.currentTarget.style.background = 'transparent'
               }}
             >
-              <div className="relative flex-shrink-0">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-                  style={{
-                    background: activeRoom === user ? '#1A1208' : '#2D1F0E',
-                    color: activeRoom === user ? '#C17817' : '#E8A838'
-                  }}>
-                  {user[0].toUpperCase()}
-                </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2"
-                  style={{ borderColor: '#1A1208' }}/>
-              </div>
-              <span className="text-sm font-medium truncate flex-1 text-left">{user}</span>
+              <Avatar username={user} size={28} showStatus status="online"/>
+              <span
+                className="text-sm font-medium truncate flex-1 text-left"
+                style={{ color: activeRoom === user ? c.primary : c.textMuted }}
+              >
+                {user}
+              </span>
               {unreadCounts[user] > 0 && (
-                <span className="text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0"
-                  style={{ background: '#E8A838', color: '#1A1208' }}>
+                <span
+                  className="text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0"
+                  style={{ background: c.primary, color: c.bg }}
+                >
                   {unreadCounts[user] > 9 ? '9+' : unreadCounts[user]}
                 </span>
               )}
             </button>
-          ))
-        )}
+          ))}
+        </div>
       </div>
 
-      {/* Bottom controls */}
-      <div className="p-3" style={{ borderTop: '1px solid #3D2A12' }}>
-
+      {/* ── Bottom controls ── */}
+      <div
+        className="p-3 space-y-1"
+        style={{ borderTop: `1px solid ${c.border}` }}
+      >
         {/* Encryption toggle */}
         <button
           onClick={onToggleEncryption}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-colors mb-2"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-colors"
           style={{
-            background: showEncryption ? '#3D2A12' : 'transparent',
-            color: showEncryption ? '#E8A838' : '#5A3D10',
-            border: showEncryption ? '1px solid #C17817' : '1px solid transparent'
+            background: showEncryption ? c.primary + '22' : 'transparent',
+            color: showEncryption ? c.primary : c.textFaint,
+            border: showEncryption ? `1px solid ${c.primary}44` : '1px solid transparent',
           }}
+          onMouseEnter={e => e.currentTarget.style.background = c.bgTertiary}
+          onMouseLeave={e => e.currentTarget.style.background = showEncryption ? c.primary + '22' : 'transparent'}
         >
-          {showEncryption ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
+          <Shield className="w-4 h-4"/>
           <span>{showEncryption ? 'Hide encryption' : 'Show encryption'}</span>
         </button>
 
-        {/* Dark mode toggle */}
+        {/* Appearance */}
         <button
-          onClick={onToggleDark}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-colors mb-2"
-          style={{ color: '#5A3D10' }}
+          onClick={onOpenAppearance}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-colors"
+          style={{ color: c.textFaint }}
+          onMouseEnter={e => e.currentTarget.style.background = c.bgTertiary}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <span>{darkMode ? '☀️' : '🌙'}</span>
-          <span>{darkMode ? 'Light mode' : 'Dark mode'}</span>
+          <Settings className="w-4 h-4"/>
+          <span>Appearance</span>
         </button>
 
-        {/* Leave button */}
+        {/* Leave */}
         <button
           onClick={onLeave}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-colors"
-          style={{ color: '#8B3A3A' }}
+          style={{ color: '#FF5252' }}
+          onMouseEnter={e => e.currentTarget.style.background = '#FF525218'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <span>🚪</span>
+          <LogOut className="w-4 h-4"/>
           <span>Leave WereWere</span>
         </button>
-
       </div>
     </div>
   )
