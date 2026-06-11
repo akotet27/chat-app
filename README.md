@@ -29,8 +29,9 @@ chat-app/
 
 Here is a simple preview of the app:
 
-![Chat app preview](front-end/src/assets/hero.png)
-
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
 ## How to run
 
 ### 1. Start the backend
