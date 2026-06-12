@@ -219,6 +219,24 @@ async def websocket_endpoint(ws: WebSocket, username: str):
                         })
                         break
 
+            elif msg_type == "voice_note":
+                to = data.get("to")
+                audio = data.get("audio")
+                duration = data.get("duration", "0:00")
+                timestamp = data.get("timestamp", "")
+                payload = {
+                    "type": "voice_note",
+                    "id": msg_counter,
+                    "from": username,
+                    "to": to,
+                    "audio": audio,
+                    "duration": duration,
+                    "timestamp": timestamp,
+                }
+                msg_counter += 1
+                await manager.send_to(to, payload)
+                await manager.send_to(username, payload)
+
             elif msg_type == "read":
                 from_user = data.get("from")
                 await manager.send_to(from_user, {

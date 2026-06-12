@@ -17,51 +17,40 @@ export function useWebSocket(username) {
 
     ws.current = new WebSocket(`${WS_URL}/${username}`)
 
-    ws.current.onopen = () => {
-      setConnected(true)
-    }
+    ws.current.onopen = () => setConnected(true)
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data)
       handleMessage(data)
     }
 
-    ws.current.onclose = () => {
-      setConnected(false)
-    }
+    ws.current.onclose = () => setConnected(false)
 
-    return () => {
-      ws.current?.close()
-    }
+    return () => { ws.current?.close() }
   }, [username])
 
   const handleMessage = useCallback((data) => {
     switch (data.type) {
 
-      // someone joined or left — update user list
       case 'user_joined':
       case 'user_left':
         setOnlineUsers(data.users)
         break
 
-      // load message history when first joining
       case 'history':
         setGroupMessages(data.messages)
         break
 
-      // new group message
       case 'group_message':
         setGroupMessages(prev => [...prev, data])
         break
 
-      // new private message
       case 'private_message':
         const otherUser = data.from === username ? data.to : data.from
         setPrivateMessages(prev => ({
           ...prev,
           [otherUser]: [...(prev[otherUser] || []), data]
         }))
-        // add unread badge if message is FROM someone else
         if (data.from !== username) {
           setUnreadCounts(prev => ({
             ...prev,
@@ -70,7 +59,6 @@ export function useWebSocket(username) {
         }
         break
 
-      // private message history loaded
       case 'private_history':
         setPrivateMessages(prev => ({
           ...prev,
@@ -78,7 +66,6 @@ export function useWebSocket(username) {
         }))
         break
 
-      // emoji reaction updated
       case 'reaction':
         setGroupMessages(prev =>
           prev.map(msg =>
@@ -89,14 +76,10 @@ export function useWebSocket(username) {
         )
         break
 
-      // someone is typing
       case 'typing':
         const room = data.room === 'general' ? 'general' : data.from
         setTypingUsers(prev => ({ ...prev, [room]: data.from }))
-        // clear typing after 3 seconds automatically
-        if (typingTimers.current[room]) {
-          clearTimeout(typingTimers.current[room])
-        }
+        if (typingTimers.current[room]) clearTimeout(typingTimers.current[room])
         typingTimers.current[room] = setTimeout(() => {
           setTypingUsers(prev => {
             const updated = { ...prev }
@@ -106,7 +89,6 @@ export function useWebSocket(username) {
         }, 3000)
         break
 
-      // someone stopped typing
       case 'stop_typing':
         const stopRoom = data.room === 'general' ? 'general' : data.from
         setTypingUsers(prev => {
@@ -116,12 +98,35 @@ export function useWebSocket(username) {
         })
         break
 
+      // ── VOICE NOTE ──────────────────────────────────
+      case 'voice_note':
+        const voiceOther = data.from === username ? data.to : data.from
+        setPrivateMessages(prev => ({
+          ...prev,
+          [voiceOther]: [...(prev[voiceOther] || []), {
+            id: data.id,
+            from: data.from,
+            to: data.to,
+            voiceNote: data.audio,
+            voiceDuration: data.duration,
+            timestamp: data.timestamp,
+            reactions: {},
+          }]
+        }))
+        if (data.from !== username) {
+          setUnreadCounts(prev => ({
+            ...prev,
+            [data.from]: (prev[data.from] || 0) + 1
+          }))
+        }
+        break
+
       default:
         break
     }
   }, [username])
 
-  // ── SEND FUNCTIONS ────────────────────────────────────
+  // ── SEND FUNCTIONS ───────────────────────────────────
 
   const sendGroupMessage = useCallback((text) => {
     if (!ws.current || !text.trim()) return
@@ -140,6 +145,19 @@ export function useWebSocket(username) {
       type: 'private_message',
       to,
       text,
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: '2-digit', minute: '2-digit'
+      })
+    }))
+  }, [])
+
+  const sendVoiceNote = useCallback((to, audio, duration) => {
+    if (!ws.current) return
+    ws.current.send(JSON.stringify({
+      type: 'voice_note',
+      to,
+      audio,
+      duration,
       timestamp: new Date().toLocaleTimeString([], {
         hour: '2-digit', minute: '2-digit'
       })
@@ -186,6 +204,7 @@ export function useWebSocket(username) {
     unreadCounts,
     sendGroupMessage,
     sendPrivateMessage,
+    sendVoiceNote,
     sendTyping,
     sendStopTyping,
     sendReaction,

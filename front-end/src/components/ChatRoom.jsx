@@ -41,7 +41,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
   const {
     connected, onlineUsers, groupMessages,
     privateMessages, typingUsers, unreadCounts,
-    sendGroupMessage, sendPrivateMessage,
+    sendGroupMessage, sendPrivateMessage, sendVoiceNote,
     sendTyping, sendStopTyping, sendReaction,
     fetchPrivateHistory, clearUnread,
   } = useWebSocket(username)
@@ -186,30 +186,30 @@ function ChatRoom({ username, onLeave, onGoHome }) {
     setActiveRoom(`group:${groupId}`)
   }
 
-  const handleVoiceSend = ({ audio, duration }) => {
+
+const handleVoiceSend = ({ audio, duration }) => {
+  if (isDM) {
+    //sends through WebSocket → server → other person receives it
+    sendVoiceNote(activeRoom, audio, duration)
+  } else {
+    // For channels — add locally since group voice isn't on backend yet
     const msg = {
       id: Date.now(),
       from: username,
       voiceNote: audio,
       voiceDuration: duration,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: '2-digit', minute: '2-digit'
+      }),
       reactions: {},
     }
-    if (isDM) {
-      const otherUser = activeRoom
-      const updatedPrivate = {
-        ...privateMessages,
-        [otherUser]: [...(privateMessages[otherUser] || []), msg],
-      }
-      sendPrivateMessage(activeRoom, '[Voice Note]')
-    } else {
-      setChannelMessages(prev => ({
-        ...prev,
-        [activeRoom]: [...(prev[activeRoom] || []), msg],
-      }))
-    }
-    setShowVoice(false)
+    setChannelMessages(prev => ({
+      ...prev,
+      [activeRoom]: [...(prev[activeRoom] || []), msg],
+    }))
   }
+  setShowVoice(false)
+}
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus)
