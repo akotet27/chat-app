@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 export const THEMES = {
   buna: {
     name: 'Buna',
-    emoji: '☕',
+    emoji: '🫖',
     description: 'Ethiopian coffee warmth',
     colors: {
       bg:           '#0D0804',

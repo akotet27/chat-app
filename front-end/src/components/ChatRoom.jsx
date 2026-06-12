@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Send, ArrowLeft, Shield, Mic, X, AtSign, Hash, Users } from 'lucide-react'
 import MessageBubble from './MessageBubble'
+import SiniCupIcon from './SiniCupIcon'
 import TypingIndicator from './TypingIndicator'
 import Sidebar from './Sidebar'
 import AppearanceMenu from './AppearanceMenu'
@@ -346,7 +347,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
                 className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
                 style={{ background: c.bgSecondary }}
               >
-                <span className="text-3xl">☕</span>
+                <SiniCupIcon className="w-8 h-8" color={c.primary} strokeWidth={2} />
               </div>
               <p className="font-semibold mb-1" style={{ color: c.textMuted }}>
                 {isDM ? `Start a private chat with ${activeRoom}` : isGroup ? `Welcome to ${getCurrentGroup()?.name}!` : `Welcome to #${activeRoom}!`}
@@ -483,8 +484,9 @@ function ChatRoom({ username, onLeave, onGoHome }) {
                 </button>
               </div>
 
-              <p className="text-xs mt-2 text-center" style={{ color: c.textFaint }}>
-                ☕ WereWere · AES encrypted · Enter to send · @ to mention
+              <p className="text-xs mt-2 text-center flex items-center justify-center gap-1" style={{ color: c.textFaint }}>
+                <SiniCupIcon className="w-3.5 h-3.5" color={c.textFaint} strokeWidth={2} />
+                WereWere · AES encrypted · Enter to send · @ to mention
               </p>
             </div>
           )}

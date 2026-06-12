@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Shield, Zap, MessageCircle, Coffee, Users, Lock } from 'lucide-react'
+import { Shield, Zap, MessageCircle, Users, Lock } from 'lucide-react'
 import { useTheme } from '../hooks/useTheme'
+import SiniCupIcon from './SiniCupIcon'
 
 function JoinScreen({ onJoin, savedName }) {
   const [name, setName] = useState(savedName || '')
@@ -71,7 +72,7 @@ function JoinScreen({ onJoin, savedName }) {
               opacity: 0.03,
             }}
           >
-            ☕
+            
           </div>
         ))}
       </div>
@@ -136,7 +137,7 @@ function JoinScreen({ onJoin, savedName }) {
               }}
             >
               <div className="relative">
-                <Coffee className="w-8 h-8" style={{ color: c.bg }} strokeWidth={2}/>
+                <SiniCupIcon className="w-8 h-8" color={c.bg} strokeWidth={2} />
                 <div
                   className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center"
                   style={{ background: c.bg }}
@@ -215,7 +216,7 @@ function JoinScreen({ onJoin, savedName }) {
             onClick={e => e.stopPropagation()}
           >
             <h2 className="font-bold text-lg mb-1" style={{ color: c.text }}>
-              Yene Konjo, join the buna! ☕
+              Yene Konjo, join the buna! 
             </h2>
             <p className="text-sm mb-5" style={{ color: c.textMuted }}>
               Enter your name to start chatting
@@ -249,14 +250,14 @@ function JoinScreen({ onJoin, savedName }) {
                 color: c.bg,
               }}
             >
-              ☕ Join WereWere
+              Join WereWere
             </button>
 
             <p
               className="text-center text-xs mt-4"
               style={{ color: c.textFaint }}
             >
-              🔒 AES-128 encrypted · {logoClicks > 3 ? '☕'.repeat(Math.min(logoClicks - 3, 5)) : 'All messages protected'}
+              🔒 AES-128 encrypted · {logoClicks > 3 ? ''.repeat(Math.min(logoClicks - 3, 5)) : 'All messages protected'}
             </p>
           </div>
         </div>

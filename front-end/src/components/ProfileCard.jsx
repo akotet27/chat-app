@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { X, Check, Coffee, Wifi, Moon, MinusCircle } from 'lucide-react'
+import { X, Check, Wifi, Moon, MinusCircle } from 'lucide-react'
+import SiniCupIcon from './SiniCupIcon'
 
 const STATUSES = [
     { key: 'online', label: 'Online', color: '#4CAF50', icon: <Wifi className="w-3.5 h-3.5" /> },
     { key: 'busy', label: 'Busy', color: '#FF5722', icon: <MinusCircle className="w-3.5 h-3.5" /> },
     { key: 'away', label: 'Away', color: '#FFC107', icon: <Moon className="w-3.5 h-3.5" /> },
-    { key: 'buna', label: 'At coffee ☕', color: '#C17817', icon: <Coffee className="w-3.5 h-3.5" /> },
+    { key: 'buna', label: 'At buna', color: '#C17817', icon: <SiniCupIcon className="w-3.5 h-3.5" /> },
 ]
 
 const AVATAR_GRADIENTS = [

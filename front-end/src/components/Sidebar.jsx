@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { 
   MessageCircle, Users, Lock, Plus, X, 
-  Search, Settings, Coffee, Hash,
+  Search, Settings, Hash,
   Eye, EyeOff, LogOut, ChevronDown,
   ChevronRight, Shield
 } from 'lucide-react'
 import { Avatar } from './ProfileCard'
+import SiniCupIcon from './SiniCupIcon'
 
 function Sidebar({
   username, status, onlineUsers, unreadCounts,
@@ -74,7 +75,7 @@ function Sidebar({
             className="w-8 h-8 rounded-xl flex items-center justify-center relative"
             style={{ background: `linear-gradient(135deg, ${c.primary}, ${c.primaryLight})` }}
           >
-            <Coffee className="w-4 h-4" style={{ color: c.bg }} strokeWidth={2}/>
+            <SiniCupIcon className="w-4 h-4" color={c.bg} strokeWidth={2} />
             <div
               className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full flex items-center justify-center"
               style={{ background: c.bg }}
