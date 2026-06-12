@@ -18,6 +18,7 @@ export function useWebSocket(username, authToken) {
   const [lastSeen, setLastSeen] = useState({})
   const [authUser, setAuthUser] = useState(null)
   const typingTimers = useRef({})
+  const pendingMessagesRef = useRef([])
 
   const playNotificationSound = useCallback(() => {
     try {
@@ -191,6 +192,32 @@ export function useWebSocket(username, authToken) {
     }
   }, [username, playNotificationSound])
 
+  const sendSocketMessage = useCallback((payload) => {
+    const socket = ws.current
+    if (!socket) return false
+
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(payload))
+      return true
+    }
+
+    if (socket.readyState === WebSocket.CONNECTING) {
+      pendingMessagesRef.current.push(payload)
+      return false
+    }
+
+    return false
+  }, [])
+
+  const flushPendingMessages = useCallback(() => {
+    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return
+
+    while (pendingMessagesRef.current.length > 0) {
+      const payload = pendingMessagesRef.current.shift()
+      ws.current.send(JSON.stringify(payload))
+    }
+  }, [])
+
   useEffect(() => {
     if (!username) return
 
@@ -201,6 +228,7 @@ export function useWebSocket(username, authToken) {
       if (authToken) {
         ws.current.send(JSON.stringify({ type: 'auth', token: authToken }))
       }
+      flushPendingMessages()
     }
 
     ws.current.onmessage = (event) => {
@@ -208,104 +236,96 @@ export function useWebSocket(username, authToken) {
       handleMessage(data)
     }
 
-    ws.current.onclose = () => setConnected(false)
+    ws.current.onclose = () => {
+      setConnected(false)
+      pendingMessagesRef.current = []
+    }
 
     return () => {
       ws.current?.close()
     }
-  }, [username, authToken, handleMessage])
+  }, [username, authToken, handleMessage, flushPendingMessages])
 
   const sendGroupMessage = useCallback((text, room = 'general') => {
-    if (!ws.current || !text.trim()) return
-    ws.current.send(JSON.stringify({
+    if (!text.trim()) return
+    sendSocketMessage({
       type: 'group_message',
       room,
       text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }))
-  }, [])
+    })
+  }, [sendSocketMessage])
 
   const sendPrivateMessage = useCallback((to, text) => {
-    if (!ws.current || !text.trim()) return
-    ws.current.send(JSON.stringify({
+    if (!text.trim()) return
+    sendSocketMessage({
       type: 'private_message',
       to,
       text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }))
-  }, [])
+    })
+  }, [sendSocketMessage])
 
   const sendVoiceNote = useCallback((to, audio, duration) => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({
+    sendSocketMessage({
       type: 'voice_note',
       to,
       audio,
       duration,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }))
-  }, [])
+    })
+  }, [sendSocketMessage])
 
   const sendTyping = useCallback((to = 'general') => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'typing', to }))
-  }, [])
+    sendSocketMessage({ type: 'typing', to })
+  }, [sendSocketMessage])
 
   const sendStopTyping = useCallback((to = 'general') => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'stop_typing', to }))
-  }, [])
+    sendSocketMessage({ type: 'stop_typing', to })
+  }, [sendSocketMessage])
 
   const sendReaction = useCallback((messageId, emoji, room = 'general') => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'reaction', room, message_id: messageId, emoji }))
-  }, [])
+    sendSocketMessage({ type: 'reaction', room, message_id: messageId, emoji })
+  }, [sendSocketMessage])
 
   const fetchPrivateHistory = useCallback((withUser) => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'fetch_private', with: withUser }))
-  }, [])
+    sendSocketMessage({ type: 'fetch_private', with: withUser })
+  }, [sendSocketMessage])
 
   const createChannel = useCallback((name) => {
-    if (!ws.current || !name.trim()) return
-    ws.current.send(JSON.stringify({ type: 'create_channel', name }))
-  }, [])
+    if (!name.trim()) return
+    sendSocketMessage({ type: 'create_channel', name })
+  }, [sendSocketMessage])
 
   const fetchChannelHistory = useCallback((room) => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'fetch_channel_history', room }))
-  }, [])
+    sendSocketMessage({ type: 'fetch_channel_history', room })
+  }, [sendSocketMessage])
 
   const editMessage = useCallback((room, messageId, text) => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'edit_message', room, message_id: messageId, text }))
-  }, [])
+    sendSocketMessage({ type: 'edit_message', room, message_id: messageId, text })
+  }, [sendSocketMessage])
 
   const deleteMessage = useCallback((room, messageId) => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'delete_message', room, message_id: messageId }))
-  }, [])
+    sendSocketMessage({ type: 'delete_message', room, message_id: messageId })
+  }, [sendSocketMessage])
 
   const pinMessage = useCallback((room, messageId) => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'pin_message', room, message_id: messageId }))
-  }, [])
+    sendSocketMessage({ type: 'pin_message', room, message_id: messageId })
+  }, [sendSocketMessage])
 
   const forwardMessage = useCallback((room, messageId, targetRoom) => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({ type: 'forward_message', room, message_id: messageId, target_room: targetRoom }))
-  }, [])
+    sendSocketMessage({ type: 'forward_message', room, message_id: messageId, target_room: targetRoom })
+  }, [sendSocketMessage])
 
   const sendFileMessage = useCallback((room, attachment, text = '') => {
-    if (!ws.current) return
-    ws.current.send(JSON.stringify({
+    sendSocketMessage({
       type: 'file_message',
       room,
       text,
       attachment,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }))
-  }, [])
+    })
+  }, [sendSocketMessage])
 
   const clearUnread = useCallback((usernameKey) => {
     setUnreadCounts(prev => ({ ...prev, [usernameKey]: 0 }))
