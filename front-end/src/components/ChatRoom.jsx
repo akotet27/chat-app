@@ -218,12 +218,12 @@ function ChatRoom({ username, onLeave, onGoHome }) {
 
   // Get room display info
   const getRoomInfo = () => {
-    if (isChannel) return { name: `# ${activeRoom}`, sub: `${onlineUsers.length} online`, icon: <Hash className="w-4 h-4"/> }
+    if (isChannel) return { name: `# ${activeRoom}`, sub: `${onlineUsers.length} online`, icon: <Hash className="w-4 h-4" /> }
     if (isGroup) {
       const g = getCurrentGroup()
-      return { name: g?.name || 'Group', sub: `${g?.members.length || 0} members`, icon: <Users className="w-4 h-4"/> }
+      return { name: g?.name || 'Group', sub: `${g?.members.length || 0} members`, icon: <Users className="w-4 h-4" /> }
     }
-    return { name: activeRoom, sub: 'Direct message', icon: <Avatar username={activeRoom} size={20}/> }
+    return { name: activeRoom, sub: 'Direct message', icon: <Avatar username={activeRoom} size={20} /> }
   }
 
   const roomInfo = getRoomInfo()
@@ -290,7 +290,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
               className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ background: c.bgTertiary, color: c.textMuted }}
             >
-              <Hash className="w-4 h-4"/>
+              <Hash className="w-4 h-4" />
             </button>
 
             {/* Back button for DMs on mobile */}
@@ -300,7 +300,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
                 className="md:hidden"
                 style={{ color: c.primary }}
               >
-                <ArrowLeft className="w-5 h-5"/>
+                <ArrowLeft className="w-5 h-5" />
               </button>
             )}
 
@@ -325,7 +325,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
             className="flex items-center gap-2 rounded-full px-3 py-1.5"
             style={{ background: c.bgTertiary, border: `1px solid ${c.border}` }}
           >
-            <Shield className="w-3.5 h-3.5" style={{ color: c.primary }}/>
+            <Shield className="w-3.5 h-3.5" style={{ color: c.primary }} />
             <span className="text-xs font-medium hidden sm:block" style={{ color: c.primary }}>
               Encrypted
             </span>
@@ -371,8 +371,8 @@ function ChatRoom({ username, onLeave, onGoHome }) {
             />
           ))}
 
-          {whoIsTyping && <TypingIndicator name={whoIsTyping} theme={theme}/>}
-          <div ref={messagesEndRef}/>
+          {whoIsTyping && <TypingIndicator name={whoIsTyping} theme={theme} />}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input area */}
@@ -409,7 +409,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
                         onMouseEnter={e => e.currentTarget.style.background = c.bgTertiary}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
-                        <Avatar username={user} size={24}/>
+                        <Avatar username={user} size={24} />
                         <span className="text-sm font-medium">{user}</span>
                       </button>
                     ))}
@@ -427,7 +427,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
                   onMouseLeave={e => e.currentTarget.style.background = c.bgTertiary}
                   title="Voice note"
                 >
-                  <Mic className="w-4 h-4"/>
+                  <Mic className="w-4 h-4" />
                 </button>
 
                 {/* Text input */}
@@ -439,8 +439,8 @@ function ChatRoom({ username, onLeave, onGoHome }) {
                     onKeyDown={handleKey}
                     placeholder={
                       isDM ? `Message ${activeRoom}...`
-                      : isGroup ? `Message ${getCurrentGroup()?.name}...`
-                      : `Message #${activeRoom}...`
+                        : isGroup ? `Message ${getCurrentGroup()?.name}...`
+                          : `Message #${activeRoom}...`
                     }
                     rows={1}
                     className="w-full rounded-xl px-4 py-2.5 pr-10 text-sm resize-none focus:outline-none transition-colors"
@@ -467,7 +467,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
                     onMouseEnter={e => e.currentTarget.style.color = c.primary}
                     onMouseLeave={e => e.currentTarget.style.color = c.textFaint}
                   >
-                    <AtSign className="w-4 h-4"/>
+                    <AtSign className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -478,9 +478,9 @@ function ChatRoom({ username, onLeave, onGoHome }) {
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40"
                   style={{ background: c.primary }}
                   onMouseEnter={e => { if (input.trim()) e.currentTarget.style.opacity = '0.85' }}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '1' }
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                 >
-                  <Send className="w-4 h-4" style={{ color: c.bg }}/>
+                  <Send className="w-4 h-4" style={{ color: c.bg }} />
                 </button>
               </div>
 

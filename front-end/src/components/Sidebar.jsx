@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { 
-  MessageCircle, Users, Lock, Plus, X, 
+import {
+  MessageCircle, Users, Lock, Plus, X,
   Search, Settings, Hash,
   Eye, EyeOff, LogOut, ChevronDown,
   ChevronRight, Shield
@@ -80,7 +80,7 @@ function Sidebar({
               className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full flex items-center justify-center"
               style={{ background: c.bg }}
             >
-              <MessageCircle className="w-2 h-2" style={{ color: c.primary }} strokeWidth={2.5}/>
+              <MessageCircle className="w-2 h-2" style={{ color: c.primary }} strokeWidth={2.5} />
             </div>
           </div>
           <span className="font-black text-base" style={{ color: c.text, letterSpacing: '-0.5px' }}>
@@ -97,7 +97,7 @@ function Sidebar({
           onMouseLeave={e => e.currentTarget.style.background = c.bgTertiary}
         >
           <div className="relative flex-shrink-0">
-            <Avatar username={username} size={30}/>
+            <Avatar username={username} size={30} />
             <div
               className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2"
               style={{
@@ -110,7 +110,7 @@ function Sidebar({
             style={{ color: c.text }}>
             {username}
           </span>
-          <Settings className="w-3.5 h-3.5 flex-shrink-0" style={{ color: c.textFaint }}/>
+          <Settings className="w-3.5 h-3.5 flex-shrink-0" style={{ color: c.textFaint }} />
         </button>
       </div>
 
@@ -123,7 +123,7 @@ function Sidebar({
           onMouseEnter={e => e.currentTarget.style.background = c.border}
           onMouseLeave={e => e.currentTarget.style.background = c.bgTertiary}
         >
-          <Search className="w-4 h-4"/>
+          <Search className="w-4 h-4" />
           <span>Search...</span>
           <span
             className="ml-auto text-xs px-1.5 py-0.5 rounded"
@@ -147,8 +147,8 @@ function Sidebar({
             onMouseLeave={e => e.currentTarget.style.color = c.textFaint}
           >
             {channelsOpen
-              ? <ChevronDown className="w-3.5 h-3.5"/>
-              : <ChevronRight className="w-3.5 h-3.5"/>
+              ? <ChevronDown className="w-3.5 h-3.5" />
+              : <ChevronRight className="w-3.5 h-3.5" />
             }
             <span className="text-xs font-bold uppercase tracking-wider flex-1 text-left">
               Channels
@@ -158,7 +158,7 @@ function Sidebar({
               className="w-5 h-5 rounded flex items-center justify-center hover:opacity-80"
               style={{ color: c.textFaint }}
             >
-              <Plus className="w-3.5 h-3.5"/>
+              <Plus className="w-3.5 h-3.5" />
             </button>
           </button>
 
@@ -186,14 +186,14 @@ function Sidebar({
                 className="w-7 h-7 rounded-lg flex items-center justify-center"
                 style={{ background: c.primary, color: c.bg }}
               >
-                <Plus className="w-3.5 h-3.5"/>
+                <Plus className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setShowNewChannel(false)}
                 className="w-7 h-7 rounded-lg flex items-center justify-center"
                 style={{ color: c.textFaint }}
               >
-                <X className="w-3.5 h-3.5"/>
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
@@ -215,7 +215,7 @@ function Sidebar({
                 if (activeRoom !== channel) e.currentTarget.style.background = 'transparent'
               }}
             >
-              <Hash className="w-4 h-4 flex-shrink-0"/>
+              <Hash className="w-4 h-4 flex-shrink-0" />
               <span className="truncate">{channel}</span>
             </button>
           ))}
@@ -231,8 +231,8 @@ function Sidebar({
             onMouseLeave={e => e.currentTarget.style.color = c.textFaint}
           >
             {groupsOpen
-              ? <ChevronDown className="w-3.5 h-3.5"/>
-              : <ChevronRight className="w-3.5 h-3.5"/>
+              ? <ChevronDown className="w-3.5 h-3.5" />
+              : <ChevronRight className="w-3.5 h-3.5" />
             }
             <span className="text-xs font-bold uppercase tracking-wider flex-1 text-left">
               Groups
@@ -242,7 +242,7 @@ function Sidebar({
               className="w-5 h-5 rounded flex items-center justify-center hover:opacity-80"
               style={{ color: c.textFaint }}
             >
-              <Plus className="w-3.5 h-3.5"/>
+              <Plus className="w-3.5 h-3.5" />
             </button>
           </button>
 
@@ -356,8 +356,8 @@ function Sidebar({
             style={{ color: c.textFaint }}
           >
             {dmsOpen
-              ? <ChevronDown className="w-3.5 h-3.5"/>
-              : <ChevronRight className="w-3.5 h-3.5"/>
+              ? <ChevronDown className="w-3.5 h-3.5" />
+              : <ChevronRight className="w-3.5 h-3.5" />
             }
             <span className="text-xs font-bold uppercase tracking-wider flex-1 text-left">
               Direct Messages
@@ -389,7 +389,7 @@ function Sidebar({
                 if (activeRoom !== user) e.currentTarget.style.background = 'transparent'
               }}
             >
-              <Avatar username={user} size={28} showStatus status="online"/>
+              <Avatar username={user} size={28} showStatus status="online" />
               <span
                 className="text-sm font-medium truncate flex-1 text-left"
                 style={{ color: activeRoom === user ? c.primary : c.textMuted }}
@@ -426,7 +426,7 @@ function Sidebar({
           onMouseEnter={e => e.currentTarget.style.background = c.bgTertiary}
           onMouseLeave={e => e.currentTarget.style.background = showEncryption ? c.primary + '22' : 'transparent'}
         >
-          <Shield className="w-4 h-4"/>
+          <Shield className="w-4 h-4" />
           <span>{showEncryption ? 'Hide encryption' : 'Show encryption'}</span>
         </button>
 
@@ -438,7 +438,7 @@ function Sidebar({
           onMouseEnter={e => e.currentTarget.style.background = c.bgTertiary}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <Settings className="w-4 h-4"/>
+          <Settings className="w-4 h-4" />
           <span>Appearance</span>
         </button>
 
@@ -450,7 +450,7 @@ function Sidebar({
           onMouseEnter={e => e.currentTarget.style.background = '#FF525218'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <LogOut className="w-4 h-4"/>
+          <LogOut className="w-4 h-4" />
           <span>Leave WereWere</span>
         </button>
       </div>

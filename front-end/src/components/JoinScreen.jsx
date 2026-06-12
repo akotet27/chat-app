@@ -72,7 +72,7 @@ function JoinScreen({ onJoin, savedName }) {
               opacity: 0.03,
             }}
           >
-            
+
           </div>
         ))}
       </div>
@@ -142,7 +142,7 @@ function JoinScreen({ onJoin, savedName }) {
                   className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center"
                   style={{ background: c.bg }}
                 >
-                  <MessageCircle className="w-3 h-3" style={{ color: c.primary }} strokeWidth={2.5}/>
+                  <MessageCircle className="w-3 h-3" style={{ color: c.primary }} strokeWidth={2.5} />
                 </div>
               </div>
             </div>
@@ -182,9 +182,9 @@ function JoinScreen({ onJoin, savedName }) {
           }}
         >
           {[
-            { icon: <Lock className="w-4 h-4"/>, label: 'Encrypted' },
-            { icon: <Zap className="w-4 h-4"/>, label: 'Real-time' },
-            { icon: <Users className="w-4 h-4"/>, label: 'Groups & DMs' },
+            { icon: <Lock className="w-4 h-4" />, label: 'Encrypted' },
+            { icon: <Zap className="w-4 h-4" />, label: 'Real-time' },
+            { icon: <Users className="w-4 h-4" />, label: 'Groups & DMs' },
           ].map((f, i) => (
             <div
               key={i}
@@ -216,7 +216,7 @@ function JoinScreen({ onJoin, savedName }) {
             onClick={e => e.stopPropagation()}
           >
             <h2 className="font-bold text-lg mb-1" style={{ color: c.text }}>
-              Yene Konjo, join the buna! 
+              Yene Konjo, join the buna!
             </h2>
             <p className="text-sm mb-5" style={{ color: c.textMuted }}>
               Enter your name to start chatting
