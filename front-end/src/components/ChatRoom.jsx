@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Send, ArrowLeft, Shield, Mic, X, AtSign, Hash, Users } from 'lucide-react'
+import { Send, ArrowLeft, Shield, Mic, X, AtSign, Hash, Users, Paperclip, Link2 } from 'lucide-react'
 import MessageBubble from './MessageBubble'
 import SiniCupIcon from './SiniCupIcon'
 import TypingIndicator from './TypingIndicator'
@@ -12,7 +12,7 @@ import { useWebSocket } from '../hooks/useWebSocket'
 import { useTheme } from '../hooks/useTheme'
 import { Avatar } from './ProfileCard'
 
-function ChatRoom({ username, onLeave, onGoHome }) {
+function ChatRoom({ username, authToken, onLeave, onGoHome }) {
   const { theme, themeName, setTheme } = useTheme()
   const c = theme.colors
 
@@ -28,42 +28,53 @@ function ChatRoom({ username, onLeave, onGoHome }) {
   const [showSearch, setShowSearch] = useState(false)
   const [showVoice, setShowVoice] = useState(false)
   const [showMentions, setShowMentions] = useState(false)
-  const [status, setStatus] = useState(() =>
-    localStorage.getItem('werewere_status') || 'online'
-  )
+  const [status, setStatus] = useState(() => localStorage.getItem('werewere_status') || 'online')
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [inviteMessage, setInviteMessage] = useState('')
 
   const messagesEndRef = useRef(null)
   const typingTimeoutRef = useRef(null)
   const isTypingRef = useRef(false)
   const inputRef = useRef(null)
+  const fileInputRef = useRef(null)
 
   const {
-    connected, onlineUsers, groupMessages,
-    privateMessages, typingUsers, unreadCounts,
-    sendGroupMessage, sendPrivateMessage, sendVoiceNote,
-    sendTyping, sendStopTyping, sendReaction,
-    fetchPrivateHistory, clearUnread,
-  } = useWebSocket(username)
+    connected, onlineUsers, roomMessages, privateMessages, typingUsers, unreadCounts,
+    sendGroupMessage, sendPrivateMessage, sendVoiceNote, sendTyping, sendStopTyping, sendReaction,
+    fetchPrivateHistory, clearUnread, createChannel, fetchChannelHistory, editMessage, deleteMessage,
+    pinMessage, forwardMessage, sendFileMessage, channels: serverChannels, lastSeen,
+  } = useWebSocket(username, authToken)
 
-  // Sync group messages into general channel
   useEffect(() => {
-    setChannelMessages(prev => ({ ...prev, general: groupMessages }))
-  }, [groupMessages])
+    setChannelMessages(prev => ({ ...prev, ...roomMessages }))
+  }, [roomMessages])
+
+  useEffect(() => {
+    if (serverChannels?.length) {
+      setChannels(serverChannels.map(channel => channel.name || channel))
+    }
+  }, [serverChannels])
 
   // Scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [channelMessages, privateMessages, groupMessages2, activeRoom])
 
-  // Fetch private history when switching to DM
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const roomFromUrl = params.get('room')
+    if (roomFromUrl) setActiveRoom(roomFromUrl)
+  }, [])
+
   useEffect(() => {
     const isDM = !channels.includes(activeRoom) && !activeRoom.startsWith('group:')
     if (isDM) {
       fetchPrivateHistory(activeRoom)
       clearUnread(activeRoom)
+    } else if (channels.includes(activeRoom)) {
+      fetchChannelHistory(activeRoom)
     }
-  }, [activeRoom])
+  }, [activeRoom, channels, fetchChannelHistory, fetchPrivateHistory, clearUnread])
 
   // Keyboard shortcut for search
   useEffect(() => {
@@ -93,6 +104,8 @@ function ChatRoom({ username, onLeave, onGoHome }) {
       ? (groupMessages2[activeRoom] || [])
       : (privateMessages[activeRoom] || [])
 
+  const groupMessages = Object.values(roomMessages).flat()
+
   const whoIsTyping = typingUsers[
     isChannel ? activeRoom : isDM ? activeRoom : activeRoom
   ]
@@ -102,7 +115,7 @@ function ChatRoom({ username, onLeave, onGoHome }) {
     if (isDM) {
       sendPrivateMessage(activeRoom, input)
     } else {
-      sendGroupMessage(input)
+      sendGroupMessage(input, activeRoom)
     }
     setInput('')
     sendStopTyping(activeRoom)
@@ -161,17 +174,20 @@ function ChatRoom({ username, onLeave, onGoHome }) {
 
   const handleSelectRoom = (room) => {
     setActiveRoom(room)
+    if (channels.includes(room)) {
+      fetchChannelHistory(room)
+    }
     if (!channels.includes(room) && !room.startsWith('group:')) {
       clearUnread(room)
     }
   }
 
   const handleCreateChannel = (name) => {
-    if (!channels.includes(name)) {
-      setChannels(prev => [...prev, name])
-      setChannelMessages(prev => ({ ...prev, [name]: [] }))
-    }
-    setActiveRoom(name)
+    const normalized = name.trim().toLowerCase().replace(/\s+/g, '-')
+    if (!normalized) return
+    createChannel(normalized)
+    setChannelMessages(prev => ({ ...prev, [normalized]: [] }))
+    setActiveRoom(normalized)
   }
 
   const handleCreateGroup = (name, members) => {
@@ -187,33 +203,85 @@ function ChatRoom({ username, onLeave, onGoHome }) {
   }
 
 
-const handleVoiceSend = ({ audio, duration }) => {
-  if (isDM) {
-    //sends through WebSocket → server → other person receives it
-    sendVoiceNote(activeRoom, audio, duration)
-  } else {
-    // For channels — add locally since group voice isn't on backend yet
-    const msg = {
-      id: Date.now(),
-      from: username,
-      voiceNote: audio,
-      voiceDuration: duration,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit', minute: '2-digit'
-      }),
-      reactions: {},
+  const handleVoiceSend = ({ audio, duration }) => {
+    if (isDM) {
+      //sends through WebSocket → server → other person receives it
+      sendVoiceNote(activeRoom, audio, duration)
+    } else {
+      // For channels — add locally since group voice isn't on backend yet
+      const msg = {
+        id: Date.now(),
+        from: username,
+        voiceNote: audio,
+        voiceDuration: duration,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: '2-digit', minute: '2-digit'
+        }),
+        reactions: {},
+      }
+      setChannelMessages(prev => ({
+        ...prev,
+        [activeRoom]: [...(prev[activeRoom] || []), msg],
+      }))
     }
-    setChannelMessages(prev => ({
-      ...prev,
-      [activeRoom]: [...(prev[activeRoom] || []), msg],
-    }))
+    setShowVoice(false)
   }
-  setShowVoice(false)
-}
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus)
     localStorage.setItem('werewere_status', newStatus)
+  }
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      sendFileMessage(activeRoom, {
+        name: file.name,
+        type: file.type,
+        content: reader.result,
+      })
+    }
+    reader.readAsDataURL(file)
+    event.target.value = ''
+  }
+
+  const handleEditMessage = (messageId) => {
+    const current = (channelMessages[activeRoom] || []).find(msg => msg.id === messageId)
+    const nextText = window.prompt('Edit message', current?.text || '')
+    if (nextText !== null) {
+      editMessage(activeRoom, messageId, nextText)
+    }
+  }
+
+  const handleDeleteMessage = (messageId) => {
+    if (window.confirm('Delete this message?')) {
+      deleteMessage(activeRoom, messageId)
+    }
+  }
+
+  const handlePinMessage = (messageId) => {
+    pinMessage(activeRoom, messageId)
+  }
+
+  const handleForwardMessage = (messageId) => {
+    const target = window.prompt('Forward to which room?', activeRoom)
+    if (target) {
+      forwardMessage(activeRoom, messageId, target)
+    }
+  }
+
+  const handleInviteCopy = async () => {
+    const link = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(activeRoom)}`
+    try {
+      await navigator.clipboard.writeText(link)
+      setInviteMessage('Invite link copied')
+      setTimeout(() => setInviteMessage(''), 1800)
+    } catch {
+      setInviteMessage('Copy failed')
+      setTimeout(() => setInviteMessage(''), 1800)
+    }
   }
 
   // Get room display info
@@ -364,6 +432,10 @@ const handleVoiceSend = ({ audio, duration }) => {
               msg={msg}
               isOwn={msg.from === username}
               onReact={!isDM ? sendReaction : null}
+              onEdit={handleEditMessage}
+              onDelete={handleDeleteMessage}
+              onPin={handlePinMessage}
+              onForward={handleForwardMessage}
               showEncryption={showEncryption}
               onlineUsers={onlineUsers}
               currentUser={username}
@@ -430,6 +502,25 @@ const handleVoiceSend = ({ audio, duration }) => {
                   <Mic className="w-4 h-4" />
                 </button>
 
+                <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
+                  style={{ background: c.bgTertiary, color: c.textMuted }}
+                  title="Attach file"
+                >
+                  <Paperclip className="w-4 h-4" />
+                </button>
+
+                <button
+                  onClick={handleInviteCopy}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
+                  style={{ background: c.bgTertiary, color: c.textMuted }}
+                  title="Copy invite link"
+                >
+                  <Link2 className="w-4 h-4" />
+                </button>
+
                 {/* Text input */}
                 <div className="flex-1 relative">
                   <textarea
@@ -484,6 +575,7 @@ const handleVoiceSend = ({ audio, duration }) => {
                 </button>
               </div>
 
+              {inviteMessage && <p className="text-xs mt-2 text-center" style={{ color: c.primary }}>{inviteMessage}</p>}
               <p className="text-xs mt-2 text-center flex items-center justify-center gap-1" style={{ color: c.textFaint }}>
                 <SiniCupIcon className="w-3.5 h-3.5" color={c.textFaint} strokeWidth={2} />
                 WereWere · AES encrypted · Enter to send · @ to mention

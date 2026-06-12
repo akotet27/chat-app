@@ -139,12 +139,20 @@ function Sidebar({
 
         {/* ── CHANNELS section ── */}
         <div>
-          <button
+          <div
             onClick={() => setChannelsOpen(!channelsOpen)}
-            className="flex items-center gap-1 w-full px-2 py-1.5 rounded-lg transition-colors"
+            className="flex items-center gap-1 w-full px-2 py-1.5 rounded-lg transition-colors cursor-pointer"
             style={{ color: c.textFaint }}
             onMouseEnter={e => e.currentTarget.style.color = c.textMuted}
             onMouseLeave={e => e.currentTarget.style.color = c.textFaint}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setChannelsOpen(prev => !prev)
+              }
+            }}
           >
             {channelsOpen
               ? <ChevronDown className="w-3.5 h-3.5" />
@@ -153,14 +161,23 @@ function Sidebar({
             <span className="text-xs font-bold uppercase tracking-wider flex-1 text-left">
               Channels
             </span>
-            <button
+            <div
               onClick={e => { e.stopPropagation(); setShowNewChannel(!showNewChannel) }}
-              className="w-5 h-5 rounded flex items-center justify-center hover:opacity-80"
+              className="w-5 h-5 rounded flex items-center justify-center hover:opacity-80 cursor-pointer"
               style={{ color: c.textFaint }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setShowNewChannel(prev => !prev)
+                }
+              }}
             >
               <Plus className="w-3.5 h-3.5" />
-            </button>
-          </button>
+            </div>
+          </div>
 
           {/* New channel input */}
           {showNewChannel && (
@@ -223,12 +240,20 @@ function Sidebar({
 
         {/* ── GROUPS section ── */}
         <div>
-          <button
+          <div
             onClick={() => setGroupsOpen(!groupsOpen)}
-            className="flex items-center gap-1 w-full px-2 py-1.5 rounded-lg transition-colors mt-2"
+            className="flex items-center gap-1 w-full px-2 py-1.5 rounded-lg transition-colors mt-2 cursor-pointer"
             style={{ color: c.textFaint }}
             onMouseEnter={e => e.currentTarget.style.color = c.textMuted}
             onMouseLeave={e => e.currentTarget.style.color = c.textFaint}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setGroupsOpen(prev => !prev)
+              }
+            }}
           >
             {groupsOpen
               ? <ChevronDown className="w-3.5 h-3.5" />
@@ -237,14 +262,23 @@ function Sidebar({
             <span className="text-xs font-bold uppercase tracking-wider flex-1 text-left">
               Groups
             </span>
-            <button
+            <div
               onClick={e => { e.stopPropagation(); setShowNewGroup(!showNewGroup) }}
-              className="w-5 h-5 rounded flex items-center justify-center hover:opacity-80"
+              className="w-5 h-5 rounded flex items-center justify-center hover:opacity-80 cursor-pointer"
               style={{ color: c.textFaint }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setShowNewGroup(prev => !prev)
+                }
+              }}
             >
               <Plus className="w-3.5 h-3.5" />
-            </button>
-          </button>
+            </div>
+          </div>
 
           {/* New group form */}
           {showNewGroup && (
